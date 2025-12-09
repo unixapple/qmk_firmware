@@ -107,6 +107,81 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // 
 // };
 
+// ここからnicola mechanismの移植領域
+
+void matrix_init_user(void) {
+  // NICOLA親指シフト
+  set_nicola(_NICOLA);
+  // NICOLA親指シフト
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+  switch (keycode) {
+    case KC_EISU:
+      if (record->event.pressed) {
+        // NICOLA親指シフト
+        //send_string(SS_TAP(X_MHEN));		// Win
+        tap_code(X_MHEN);      // Win
+        //send_string(SS_TAP(X_LANG2));		// Mac
+        tap_code(X_LANG2);     // Mac
+//        send_string(SS_LALT(SS_TAP(KC_LSHIFT())));	// ANSI⇔JIS
+        nicola_off();
+        // NICOLA親指シフト
+
+/* LED関連はひとまずコメントアウト
+//        RGBLIGHT_MODE_RAINBOW_SWIRL(0);
+//        rgblight_sethsv_at(170,255,40, RGBLED_NUM-1); // the last LED = BLUE (NICOLA off)
+        for(int i=0; i<RGBLED_NUM; ++i) {
+            rgblight_setrgb_at(0, 0, 128, i);  // BLUE
+        }
+*/
+
+      }
+      return false;
+      break;
+    case KC_KANA2:
+      if (record->event.pressed) {
+        // NICOLA親指シフト
+//        send_string(SS_LALT(SS_TAP(KC_LSHIFT())));	// ANSI⇔JIS
+        //send_string(SS_TAP(X_HENK));		// Win
+        tap_code(X_HENK);      // Win	
+        //send_string(SS_TAP(X_LANG1));		// Mac
+        tap_code(X_LANG1);     // Mac
+        nicola_on();
+        // NICOLA親指シフト
+
+/* LED関連はひとまずコメントアウト
+//        RGBLIGHT_MODE_RAINBOW_MOOD(0);
+//        rgblight_sethsv_at(85,255,40, RGBLED_NUM-1); // the last LED = GREEN (NICOLA on)
+        for(int i=0; i<RGBLED_NUM; ++i) {
+            rgblight_setrgb_at(0, 126, 0, i);	// GREEN
+        }
+*/
+
+      }
+      return false;
+      break;
+  }
+
+  // NICOLA親指シフト
+  bool a = true;
+  if (nicola_state()) {
+    nicola_mode(keycode, record);
+    a = process_nicola(keycode, record);
+  }
+  if (a == false) return false;
+  // NICOLA親指シフト
+
+//   bool continue_process = process_jtu(keycode, record);
+//   if (continue_process == false) {
+//     return false;
+//   }
+
+  return true;
+}
+
+// ここまでnicola mechanismの移植領域
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
