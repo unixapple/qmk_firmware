@@ -4,25 +4,6 @@
 #include QMK_KEYBOARD_H
 #include "rgb_record/rgb_record.h"
 
-#include "nicola.h" // NICOLA親指シフト
-#include "jtu.h"    // JIS keyboard on ANSI layout hardware
-
-// Japanese IME keys
-#define KC_HENK   0x8A  // Henkan
-#define KC_MHEN   0x8B  // Muhenkan
-#define KC_LANG1  0x90  // Katakana/Hiragana (Japanese mode)
-#define KC_LANG2  0x91  // Eisu (Alphanumeric mode)
-
-#define RGBLED_NUM 0
-#define X_MHEN   KC_MHEN
-#define X_LANG2  KC_LANG2
-#define X_HENK   KC_HENK
-#define X_LANG1  KC_LANG1
-
-// Each layer gets a name for readability, which is then used in the keymap matrix below.
-// The underscores don't mean anything - you can have a layer called STUFF or any other name.
-// Layer names don't all need to be of the same length, obviously, and you can also skip them
-// entirely and just use numbers.
 enum layers {
     _BL = 0,
     _FL,
