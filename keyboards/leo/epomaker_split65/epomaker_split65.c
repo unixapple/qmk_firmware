@@ -384,46 +384,51 @@ bool process_record_wls(uint16_t keycode, keyrecord_t *record) {
 }
 #endif
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-
-    if (test_white_light_flag && record->event.pressed) {
-        test_white_light_flag = false;
-        rgb_matrix_set_color_all(0x00, 0x00, 0x00);
-    }
-
-    if (*md_getp_state() == MD_STATE_CONNECTED) {
-        hs_rgb_blink_set_timer(timer_read32());
-    }
-
-    switch (keycode) {
-        case MO(_FL):
-        case MO(_MFL): {
-            if (!record->event.pressed && rgbrec_is_started()) {
-                if (no_record_fg == true) {
-                    no_record_fg = false;
-                    rgbrec_register_record(keycode, record);
-                }
-                no_record_fg = true;
-            }
-            break;
-        }
-        
-        case RGB_MOD:
-            break;
-        default: {
-            if (rgbrec_is_started()) {
-                if (!IS_QK_MOMENTARY(keycode) && record->event.pressed) {
-                    rgbrec_register_record(keycode, record);
-
-                    return false;
-                }
-            }
-        } break;
-    }
-
-    return true;
-}
-
+// //bool process_record_user(uint16_t keycode, keyrecord_t *record) { #書換え部分
+// bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+// 
+//     if (!process_record_user(keycode, record)) {   //追加部分
+//         return false;   //追加部分
+//     }   //追加部分
+// 
+//     if (test_white_light_flag && record->event.pressed) {
+//         test_white_light_flag = false;
+//         rgb_matrix_set_color_all(0x00, 0x00, 0x00);
+//     }
+// 
+//     if (*md_getp_state() == MD_STATE_CONNECTED) {
+//         hs_rgb_blink_set_timer(timer_read32());
+//     }
+// 
+//     switch (keycode) {
+//         case MO(_FL):
+//         case MO(_MFL): {
+//             if (!record->event.pressed && rgbrec_is_started()) {
+//                 if (no_record_fg == true) {
+//                     no_record_fg = false;
+//                     rgbrec_register_record(keycode, record);
+//                 }
+//                 no_record_fg = true;
+//             }
+//             break;
+//         }
+//         
+//         case RGB_MOD:
+//             break;
+//         default: {
+//             if (rgbrec_is_started()) {
+//                 if (!IS_QK_MOMENTARY(keycode) && record->event.pressed) {
+//                     rgbrec_register_record(keycode, record);
+// 
+//                     return false;
+//                 }
+//             }
+//         } break;
+//     }
+// 
+//     return true;
+// }
+ 
 void im_rgblight_increase(void) {
     HSV rgb;
     uint8_t moude;
@@ -507,6 +512,43 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     if (process_record_user(keycode, record) != true) {
         return false;
     }
+
+//もともとprocess_record_userだった部分の中身(388行目付近に定義されていた)
+    if (test_white_light_flag && record->event.pressed) {
+        test_white_light_flag = false;
+        rgb_matrix_set_color_all(0x00, 0x00, 0x00);
+    }
+
+    if (*md_getp_state() == MD_STATE_CONNECTED) {
+        hs_rgb_blink_set_timer(timer_read32());
+    }
+
+    switch (keycode) {
+        case MO(_FL):
+        case MO(_MFL): {
+            if (!record->event.pressed && rgbrec_is_started()) {
+                if (no_record_fg == true) {
+                    no_record_fg = false;
+                    rgbrec_register_record(keycode, record);
+                }
+                no_record_fg = true;
+            }
+            break;
+        }
+        
+        case RGB_MOD:
+            break;
+        default: {
+            if (rgbrec_is_started()) {
+                if (!IS_QK_MOMENTARY(keycode) && record->event.pressed) {
+                    rgbrec_register_record(keycode, record);
+
+                    return false;
+                }
+            }
+        } break;
+    }
+//ここまで：もともとprocess_record_userだった部分の中身(388行目付近に定義されていた)
 
 #ifdef WIRELESS_ENABLE
     if (process_record_wls(keycode, record) != true) {
