@@ -1,6 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "jtu.h"
 
+#define KC_LSHIFT KC_LSFT
+#define KC_RSHIFT KC_RSFT
+
 enum jtu_jis_key {
     JU_J_2,
     JU_J_6,

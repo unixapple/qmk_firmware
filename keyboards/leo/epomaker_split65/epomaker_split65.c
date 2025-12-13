@@ -1190,6 +1190,14 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+
+// matrix_scan_kb‚Ì’Ç‰Á
+void matrix_scan_kb(void) {
+    matrix_scan_user();
+}
+// end: matrix_scan_kb‚Ì’Ç‰Á
+
+
 void housekeeping_task_user(void) { // loop
     uint8_t hs_now_mode;
     static uint32_t hs_current_time;

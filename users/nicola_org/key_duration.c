@@ -16,6 +16,35 @@
  */
 #include QMK_KEYBOARD_H
 #include "key_duration.h"
+
+// --- chatGPT提案のSTM32用の実装 ---
+#include "timer.h"
+#include "key_duration.h"
+
+static keypress_timer_expired_func_t callback = NULL;
+static uint32_t timer_deadline = 0;
+static bool timer_active = false;
+
+void keypress_timer_init(keypress_timer_expired_func_t _clbk) {
+    callback = _clbk;
+    timer_active = false;
+}
+
+void keypress_timer_start(uint16_t count) {
+    timer_deadline = timer_read() + count;
+    timer_active = true;
+}
+
+void matrix_scan_user(void) {
+    if (timer_active && timer_elapsed(timer_deadline) >= 0) {
+        timer_active = false;
+        if (callback) callback();
+    }
+}
+
+
+/* 
+//以下は下記理由により削除した部分：AVR固有の命令で、split65で使用できない
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -45,3 +74,4 @@ ISR(TIMER1_COMPA_vect) // 16 bit timer 1 compare 1A match
 {
     callback();
 }
+*/
