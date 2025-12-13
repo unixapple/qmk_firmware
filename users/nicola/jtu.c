@@ -23,6 +23,9 @@ static bool rshift_to_unreg = false;
 static bool lshift_to_reg = false;
 static bool rshift_to_reg = false;
 
+#define KC_LSHIFT KC_LSFT
+#define KC_RSHIFT KC_RSFT
+
 #define UNREG_SHIFT() \
           if (lshift) { unregister_code(KC_LSFT); lshift_to_reg = true; } \
           if (rshift) { unregister_code(KC_RSFT); rshift_to_reg = true; }
