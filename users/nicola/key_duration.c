@@ -16,10 +16,29 @@
  */
 #include QMK_KEYBOARD_H
 #include "key_duration.h"
+#include "time.h" //STM32化のため追加
+
+/* STM32化のためコメントアウト
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+*/
 
+static keypress_timer_expired_func_t callback;
+static unit32_t timer_deadline = 0;
+static bool timer_active = false;
+
+// 親指シフトレイヤーに入った時に、callback
+void keypress_timer_init(keypress_timer_expired_func_t _clbk) {
+    callback = _clbk;
+}
+
+void keypress_timer_start(uint16_t count) {
+    timer_deadline = timer_read() + count;
+}
+
+
+/* STM32化のためコメントアウト
 static keypress_timer_expired_func_t callback;
 
 void keypress_timer_init(keypress_timer_expired_func_t _clbk) {
@@ -45,3 +64,4 @@ ISR(TIMER1_COMPA_vect) // 16 bit timer 1 compare 1A match
 {
     callback();
 }
+*/

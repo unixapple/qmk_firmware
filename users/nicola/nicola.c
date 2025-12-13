@@ -20,14 +20,14 @@
 
 #include QMK_KEYBOARD_H
 #include "nicola.h"
-#include "key_duration.h"
+// #include "key_duration.h" // STM32化で不要になったためコメントアウト
 #include <timer.h>
 
 static bool is_nicola = false; // 親指シフトがオンかオフか
 static uint8_t nicola_layer = 0; // レイヤー番号
 static uint8_t n_modifier = 0; // 押しているmodifierキーの数
 
-#define TIMEOUT_THRESHOLD (150)
+#define TIMEOUT_THRESHOLD (1500)
 #define OVERLAP_THRESHOLD (20)
 
 #define KC_BSPACE KC_BACKSPACE
@@ -64,7 +64,7 @@ void keypress_timer_expired(void);
 void set_nicola(uint8_t layer) {
   nicola_layer = layer;
 #ifdef TIMEOUT_INTERRUPT
-  keypress_timer_init(keypress_timer_expired);
+//  keypress_timer_init(keypress_timer_expired); //STM32化で不要になったため削除
 #endif
 }
 
@@ -320,6 +320,24 @@ void nicola_om_type(void) {
     }
 }
 
+//static uint32_t timer_deadline = 0;
+static uint32_t timer_start = 0;
+static bool timer_active = false;
+
+void keypress_timer_start(uint16_t count) {
+    //timer_deadline = timer_read() + count;
+    timer_start = timer_read();
+    timer_active = true;
+}
+
+void matrix_scan_user(void){
+    //if (timer_active && timer_elapsed(timer_deadline) >=0) {
+    if (timer_active && timer_elapsed(timer_start) >=TIMEOUT_THRESHOLD) {
+        timer_active = false;
+        keypress_timer_expired();
+    }
+}
+
 // 親指シフトの入力処理
 bool process_nicola(uint16_t keycode, keyrecord_t *record) {
   key_process_guard = 1; // timeout entrance guard
@@ -542,3 +560,4 @@ void keypress_timer_expired(void) {
         nicola_int_state = NICOLA_STATE_S1_INIT;
     }
 }
+
