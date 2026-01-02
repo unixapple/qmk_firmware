@@ -97,7 +97,7 @@ bool hs_rgb_blink_hook() {
                     hs_rgb_blink_set_timer(timer_read32());
                     md_send_devctrl(MD_SND_CMD_DEVCTRL_USB);
                     wait_ms(200);
-                    lpwr_set_timeout_manual(true);
+                    //lpwr_set_timeout_manual(true);
                 }
             }
         case MD_STATE_CONNECTED:
@@ -106,7 +106,7 @@ bool hs_rgb_blink_hook() {
             } else {
                 if (timer_elapsed32(hs_rgb_blink_get_timer()) >= HS_SLEEP_TIMEOUT) {
                     hs_rgb_blink_set_timer(timer_read32());
-                    lpwr_set_timeout_manual(true);
+                    //lpwr_set_timeout_manual(true);
                 }
             }
         default:
