@@ -1192,7 +1192,33 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 
 
 // matrix_scan_kb‚Ì’Ç‰Á
+static void right_slave_bootloader_scan(void) {
+    static uint32_t boot_timer = 0;
+    static bool     boot_armed = false;
+
+    if (is_keyboard_master()) {
+        boot_armed = false;
+        return;
+    }
+
+    bool right_fn_pressed    = matrix_is_on(11, 4);
+    bool right_shift_pressed = matrix_is_on(10, 6);
+
+    if (right_fn_pressed && right_shift_pressed) {
+        if (boot_armed == false) {
+            boot_armed = true;
+            boot_timer = timer_read32();
+        } else if (timer_elapsed32(boot_timer) > 1200) {
+            eeconfig_disable();
+            bootloader_jump();
+        }
+    } else {
+        boot_armed = false;
+    }
+}
+
 void matrix_scan_kb(void) {
+    right_slave_bootloader_scan();
     matrix_scan_user();
 }
 // end: matrix_scan_kb‚Ì’Ç‰Á
