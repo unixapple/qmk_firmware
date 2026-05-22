@@ -4,21 +4,16 @@ This document records how to build and flash the EPOMAKER Split65 firmware from 
 
 ## What Was Changed
 
-The default keymap was changed so the right-side Option/Alt position sends the normal grave/backquote key:
+This fork now builds a VIA-enabled Split65 firmware with a few practical fixes:
 
-- Base layer: `KC_RALT` was changed to `KC_GRV`.
-- Mac base layer: `KC_RGUI` was changed to `KC_GRV`.
+- VIA is enabled through `keymaps/via/rules.mk`.
+- The former right-side Option/Alt position sends `KC_GRV`, the normal grave/backquote key.
+- On a US/ANSI keyboard layout, `KC_GRV` outputs `` ` `` normally and `~` with Shift.
+- Debounce was increased from `1` ms to `5` ms to reduce accidental double characters from switch chatter.
+- Left-half Bootmagic was corrected so holding `Esc` while plugging in USB enters DFU. The real Esc matrix position is `[1, 0]`.
+- Holding `Esc` for about 1.5 seconds while the firmware is running also jumps to DFU.
 
-On a US/ANSI keyboard layout, `KC_GRV` outputs:
-
-- `` ` `` when pressed normally
-- `~` when pressed with Shift
-
-An experimental right-half local bootloader shortcut was also added in `epomaker_split65.c`:
-
-- Hold `Right Fn + R_Shift` for about 1.2 seconds.
-- This is intended to make the right half jump to bootloader mode when it is running as the non-master half.
-- This shortcut is optional and not required for flashing, because the hardware shorting method still works.
+Right-half software DFU shortcuts are intentionally not used. The right half should be flashed with the hardware DFU procedure described below.
 
 ## Important Split Keyboard Rule
 
@@ -62,13 +57,13 @@ Build the firmware:
 ```sh
 cd /Users/fortitude/qmk_firmware_banroku
 env PATH=/private/tmp/qmk12bin:/opt/homebrew/opt/arm-none-eabi-gcc@8/bin:/opt/homebrew/opt/arm-none-eabi-binutils/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin \
-  make leo/epomaker_split65:default
+  make leo/epomaker_split65:via
 ```
 
 The firmware output is copied to the QMK fork root:
 
 ```text
-/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_default.bin
+/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_via.bin
 ```
 
 There may also be build outputs under:
@@ -84,7 +79,7 @@ For flashing with QMK Toolbox, use the `.bin` file.
 Open QMK Toolbox and select:
 
 ```text
-/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_default.bin
+/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_via.bin
 ```
 
 When a half is in WB32 DFU mode, QMK Toolbox should show a device like:
@@ -106,21 +101,21 @@ Flash complete
 
 ## Flashing the Left Half
 
-Use the normal bootloader method for the left half. The keyboard README lists these options:
+Use the normal bootloader method for the left half:
 
-- Hold the physical reset switch while connecting USB.
-- Hold `Esc` while connecting USB.
-- Use a bootloader keycode if one is available in the running firmware.
+- Hold `Esc` while connecting USB. This now points to the real Esc matrix position `[1, 0]`.
+- Hold `Esc` for about 1.5 seconds while the firmware is running.
+- If software entry fails, use BOOT0 high with BOOT1 low to enter WB32 DFU as a hardware recovery path.
 
 Flash the same `.bin` file:
 
 ```text
-/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_default.bin
+/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_via.bin
 ```
 
 ## Flashing the Right Half
 
-The right half must be flashed separately.
+The right half must be flashed separately. Keep using the hardware DFU method for this half; runtime long-hold shortcuts are not reliable here because unplugging and re-plugging the right half would remove power and leave DFU mode.
 
 Hardware DFU procedure:
 
@@ -141,7 +136,7 @@ Hardware DFU procedure:
 Use the same firmware file as the left half:
 
 ```text
-/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_default.bin
+/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_via.bin
 ```
 
 ## After Flashing
@@ -162,6 +157,12 @@ If the right half does not type:
 - If needed, put the right half back into DFU mode with the hardware shorting method and reflash it.
 
 
-# prebuild firmware
+## Current Local Firmware
 
-./split65-firmwares/split65-firwarem-roptions-as-tilde-backquote-key.bin
+The latest build artifact produced by this guide is:
+
+```text
+/Users/fortitude/qmk_firmware_banroku/leo_epomaker_split65_via.bin
+```
+
+If committing this work, remember that `keyboards/leo/epomaker_split65/keymaps/via/` is ignored by this fork, so it must be added with `git add -f`.
